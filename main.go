@@ -2,21 +2,19 @@ package main
 
 import (
 	"Go_Book_Git/loggers"
+	"Go_Book_Git/service"
 	"database/sql"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
-	"html/template"
 	"net/http"
 )
 
-
-var tpl *template.Template
 var database *sql.DB
 
 func init(){
-	tpl = template.Must(template.ParseGlob("templates/*"))
-	db, err := sql.Open("mysql", "magna:m18job,,@tcp(127.0.0.1)/book")
+	db, err := sql.Open("mysql", "toyinboy:m18job,,@tcp(127.0.0.1:3306)/book")
 	if err != nil{
-		loggers.Error.Fatalln("couldn't establish a connection with the database", err)
+		loggers.Error.Fatalln(err)
 	}
 	defer db.Close()
 }
@@ -25,5 +23,7 @@ func main(){
 	router := mux.NewRouter()
 
 	http.Handle("/", router)
-	router.HandleFunc("/", home)
+	router.HandleFunc("/", service.Home)
+	loggers.Error.Fatalln(http.ListenAndServe(":8081", router))
+
 }
